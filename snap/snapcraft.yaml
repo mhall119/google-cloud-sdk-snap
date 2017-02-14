@@ -1,0 +1,65 @@
+name: google-cloud-sdk
+version: '142.0.0'
+summary: Command-line interface for Cloud Platform products and services
+description: |
+  The Cloud SDK is a set of tools for Cloud Platform. It contains gcloud, gsutil, 
+  and bq, which you can use to access Google Compute Engine, Google Cloud Storage, 
+  Google BigQuery, and other products and services from the command-line. You can 
+  run these tools interactively or in your automated scripts.
+
+grade: stable
+confinement: strict
+
+apps:
+  gcloud:
+    command: gcloud.env ${SNAP}/bin/gcloud
+    plugs: [network]
+    aliases: [gcloud]
+  bq:
+    command: gcloud.env ${SNAP}/bin/bq
+    plugs: [network]
+    aliases: [bq]
+  dev-appserver:
+    command: gcloud.env ${SNAP}/usr/bin/python2.7 ${SNAP}/bin/dev_appserver.py
+    plugs: [network]
+    aliases: [dev_appserver.py]
+  endpointscfg:
+    command: gcloud.env ${SNAP}/usr/bin/python2.7 ${SNAP}/bin/endpointscfg.py
+    plugs: [network]
+    aliases: [endpointscfg.py]
+  git-credential-gcloud:
+    command: gcloud.env ${SNAP}/bin/git-credential-gcloud.sh
+    plugs: [network]
+    aliases: [git-credential-gcloud.sh]
+  gsutil:
+    command: gcloud.env ${SNAP}/bin/gsutil
+    plugs: [network]
+    aliases: [gsutil]
+    
+parts:
+
+  sdk-tarball:
+    plugin: dump
+    source: ../google-cloud-sdk-142.0.0-linux-x86_64.tar.gz
+    stage-packages:
+      - python2.7
+    stage:
+      - -install.sh
+      - -install.bat
+
+  wrapper:
+    plugin: dump
+    source: ./
+    stage:
+      - gcloud.env
+    prime:
+      - gcloud.env
+
+  install-dir:
+    plugin: nil
+    install: |
+      mkdir -p $SNAPCRAFT_PART_INSTALL/.install
+    stage:
+      - .install
+    prime:
+      - .install
